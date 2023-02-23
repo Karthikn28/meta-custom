@@ -1,0 +1,297 @@
+diff --git a/arch/arm/boot/dts/am5729-beagleboneai.dts b/arch/arm/boot/dts/am5729-beagleboneai.dts
+index 149cfafb90bf..89ad0b961aad 100644
+--- a/arch/arm/boot/dts/am5729-beagleboneai.dts
++++ b/arch/arm/boot/dts/am5729-beagleboneai.dts
+@@ -5,7 +5,7 @@
+ 
+ /dts-v1/;
+ 
+-#include "dra74x.dtsi"
++#include "am5728.dtsi"
+ #include "am57xx-commercial-grade.dtsi"
+ #include "dra74x-mmc-iodelay.dtsi"
+ #include "dra74-ipu-dsp-common.dtsi"
+@@ -186,10 +186,14 @@ hdmi_encoder_out: endpoint@0 {
+ 	emmc_pwrseq: emmc_pwrseq {
+ 		compatible = "mmc-pwrseq-emmc";
+ 		reset-gpios = <&gpio5 7 GPIO_ACTIVE_LOW>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&emmc_pwrseq_pins_default>;
+ 	};
+ 
+ 	brcmf_pwrseq: brcmf_pwrseq {
+ 		compatible = "mmc-pwrseq-simple";
++		pinctrl-names = "default";
++		pinctrl-0 = <&brcmf_pwrseq_pins_default>;
+ 		reset-gpios = <&gpio3 22 GPIO_ACTIVE_LOW>,	/* BT-REG-ON */
+ 				<&gpio3 18 GPIO_ACTIVE_LOW>;	/* WL-REG-ON */
+ 	};
+@@ -198,9 +202,205 @@ extcon_usb1: extcon_usb1 {
+ 		compatible = "linux,extcon-usb-gpio";
+ 		ti,enable-id-detection;
+ 		id-gpio = <&gpio3 13 GPIO_ACTIVE_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&extcon_usb1_pins_default>;
++	};
++
++	cape_pins: cape_pins {	/*User Added for CAPE Compatibility*/
++		compatible = "gpio-leds";
++		pinctrl-names = "default";
++		pinctrl-0 = <&cape_pins_default>;
++	};
++};
++
++&dra7_pmx_core {
++	extcon_usb1_pins_default: extcon_usb1_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x3518, PIN_INPUT | MUX_MODE14) /* AG2: vin1a_d9.gpio3_13  - USR0 */
++		>;
+ 	};
+ };
+ 
++&dra7_pmx_core {
++ 
++	emmc_pwrseq_pins_default: emmc_pwrseq_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x36c8, PIN_OUTPUT_PULLUP | MUX_MODE14) /* F13: mcasp1_axr5.gpio5_7 - eMMC_RSTn */
++		>;
++	};
++
++	brcmf_pwrseq_pins_default: brcmf_pwrseq_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x352c, PIN_OUTPUT_PULLUP | MUX_MODE14) /* AF3: vin1a_d14.gpio3_18 - WL_REG_ON */
++			DRA7XX_CORE_IOPAD(0x353c, PIN_OUTPUT_PULLUP | MUX_MODE14) /* AE5: vin1a_d18.gpio3_22 - BT_REG_ON */
++		>;
++	};
++
++		dcan1_pins_default: dcan1_pins_default {
++  		pinctrl-single,pins = <
++   			DRA7XX_CORE_IOPAD(0x37D0, PIN_OUTPUT_PULLUP | MUX_MODE0) /* dcan1_tx.dcan1_tx - G20 */
++   			DRA7XX_CORE_IOPAD(0x37D4, PIN_INPUT_PULLUP | MUX_MODE0) /* dcan1_rx.dcan1_rx - G19 */
++  		>;
++ 	};
++
++	dcan2_pins_default: dcan2_pins_default {
++  		pinctrl-single,pins = <
++   			DRA7XX_CORE_IOPAD(0x3688, PIN_OUTPUT_PULLUP | MUX_MODE2) /* dcan2_tx.dcan1_tx - E21 */
++   			DRA7XX_CORE_IOPAD(0x368C, PIN_INPUT_PULLUP | MUX_MODE2) /* dcan2_rx.dcan1_rx - F20 */
++  		>;
++ 	};
++
++	ehrpwm1_pins_default: ehrpwm1_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x358C, PIN_INPUT_PULLDOWN | MUX_MODE10 ) /* E6: vin2a_d9 // EHRPWM2A // E6_EHRPWM2A */
++			DRA7XX_CORE_IOPAD(0x3590, PIN_INPUT_PULLDOWN | MUX_MODE10 ) /* D3: vin2a_d10 // EHRPWM2B // D3_EHRPWM2B */
++		>;
++	};
++
++	ehrpwm2_pins_default: ehrpwm2_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x35AC, PIN_INPUT_PULLDOWN | MUX_MODE10 ) /* D6: vin2a_d17 // EHRPWM3A // D6_EHRPWM3A */
++			DRA7XX_CORE_IOPAD(0x35B0, PIN_INPUT_PULLDOWN | MUX_MODE10 ) /* C5: vin2a_d18 // EHRPWM3B // C5_EHRPWM3B */
++		>;
++	};
++
++	wifibt_extra_pins_default: wifibt_extra_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x3540, PIN_INPUT | MUX_MODE14) /* AE1: vin1a_d19.gpio3_23 - WL_HOST_WAKE */
++			DRA7XX_CORE_IOPAD(0x3450, PIN_INPUT | MUX_MODE8) /* P6: vin1a_d20.uart6_rxd - UART6_RXD */
++			DRA7XX_CORE_IOPAD(0x3454, PIN_INPUT | MUX_MODE8) /* R9: vin1a_d21.uart6_txd - UART6_TXD */
++			DRA7XX_CORE_IOPAD(0x3458, PIN_INPUT | MUX_MODE8) /* R5: vin1a_d22.uart6_ctsn - UART6_CTSN */
++			DRA7XX_CORE_IOPAD(0x345c, PIN_INPUT | MUX_MODE8) /* P5: vin1a_d23.uart6_rtsn - UART6_RTSN */
++			DRA7XX_CORE_IOPAD(0x3534, PIN_INPUT_PULLDOWN | MUX_MODE14) /* AF1: vin1a_d16.gpio3_20 - BT_HOST_WAKE */
++			DRA7XX_CORE_IOPAD(0x3538, PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* AE3: vin1a_d6.gpio3_21 - BT_WAKE */
++		>;
++	};
++
++	pmic_pins_default: pmic_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x3690, PIN_INPUT_PULLUP | MUX_MODE14) /* F21: gpio6_16.gpio6_16 - PMIC_INT */
++		>;
++	};
++
++	hdmi_pins_default: hdmi_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x3808, PIN_INPUT | MUX_MODE1) /* C25: i2c2_sda.hdmi1_ddc_scl - HDMI_DDC_SCL */
++			DRA7XX_CORE_IOPAD(0x380C, PIN_INPUT | MUX_MODE1) /* F17: i2c2_scl.hdmi1_ddc_sda - HDMI_DDC_SDA */
++			DRA7XX_CORE_IOPAD(0x37BC, PIN_INPUT | MUX_MODE6) /* B20: spi1_cs3.hdmi1_cec - HDMI_DDC_CEC */
++#if 0
++			DRA7XX_CORE_IOPAD(0x37B8, PIN_INPUT | MUX_MODE6) /* B21: spi1_cs2.hdmi1_hpd - HDMI_DDC_HPD */
++#else
++			DRA7XX_CORE_IOPAD(0x37B8, PIN_INPUT | MUX_MODE14) /* B21: spi1_cs2.gpio7_12 - HDMI_DDC_HPD */
++#endif
++		>;
++	};
++
++	cape_pins_default: cape_pins_default {
++	pinctrl-single,pins = <
++
++		/* Comment format:
++
++			Ball: Default Funcationality // Functionality as per Mux Mode // Functionality in Hardware
++		
++		*/
++
++		/* PRU ADC - v3.2 & v3.3 */
++		DRA7XX_CORE_IOPAD(0x37A0, PIN_OUTPUT | MUX_MODE13 ) /* AB5: MMC3_DAT7 // pr2_pru0_gpo11 // PRU_ADC_SPI_CS */
++		DRA7XX_CORE_IOPAD(0x3620, PIN_OUTPUT | MUX_MODE13 ) /* B8: VOUT1_D17 // pr2_pru0_gpo14 // PRU_ADC_SPI_DO */
++		DRA7XX_CORE_IOPAD(0x361C, PIN_INPUT | MUX_MODE12 ) /* B7: VOUT1_D16 // pr2_pru0_gpi13 // PRU_ADC_SPI_DI */
++		DRA7XX_CORE_IOPAD(0x3618, PIN_OUTPUT | MUX_MODE13 ) /* C7: VOUT1_D15 // pr2_pru0_gpo12 // PRU_ADC_SPI_CLK */
++		DRA7XX_CORE_IOPAD(0x36EC, PIN_OUTPUT | MUX_MODE14 ) /* G14: MCASP1_AXR14 // GPIO6_5 // ~PRU_ADC_RST */
++
++		/* PRU DAC - v3.2 & v3.3 */
++		DRA7XX_CORE_IOPAD(0x3544, PIN_OUTPUT | MUX_MODE13 ) /* AE2: VIN1A_D20 // pr1_pru0_17 // PRU_DAC_SPI_DI */
++		DRA7XX_CORE_IOPAD(0x3504, PIN_OUTPUT | MUX_MODE13 ) /* AH3: VIN1A_D4 // pr1_pru0_1 // PRU_DAC_SPI_CLK */
++		DRA7XX_CORE_IOPAD(0x3530, PIN_OUTPUT | MUX_MODE13 ) /* AF4: VIN1A_D15 // pr1_pru0_12 // PRU_DAC_SPI_CS */
++		DRA7XX_CORE_IOPAD(0x36A4, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* C14: MCASP1_ACLKX // GPIO7_31 // DAC_LDAC */
++		DRA7XX_CORE_IOPAD(0x36A0, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* C23: XREF_CLK3 // GPIO6_20 // DAC_CLR */
++
++		/* 12V GPO - v3.2 & v3.3 */
++		DRA7XX_CORE_IOPAD(0x3720, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* A17: mcasp2_axr7 // GPIO1_5 // GPIO_A15_0 */
++		DRA7XX_CORE_IOPAD(0x3718, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* B16: mcasp2_axr5 // GPIO6_7 // GPIO_A15_1 */
++		DRA7XX_CORE_IOPAD(0x3710, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* A16: mcasp2_axr3 // GPIO6_9 // GPIO_A15_2 */
++		DRA7XX_CORE_IOPAD(0x36AC, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* B14: mcasp1_aclkr // GPIO5_0 // GPIO_A15_3 */
++		DRA7XX_CORE_IOPAD(0x36CC, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* C12: mcasp1_axr6 // GPIO5_8 // GPIO_A15_4 */
++		DRA7XX_CORE_IOPAD(0x35D4, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* C11: vout1_hsync // GPIO4_22 // GPIO_A15_5 */
++		DRA7XX_CORE_IOPAD(0x35D0, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* B11: vout1_fld // GPIO4_21 // GPIO_A15_6 */
++		DRA7XX_CORE_IOPAD(0x35CC, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* B10: vout1_de // GPIO4_20 // GPIO_A15_7 */
++
++		/* 12V GPI - v3.2 & v3.3 */
++		DRA7XX_CORE_IOPAD(0x37CC, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* B24: spi2_cs0 // GPIO7_17 // 12V_GPI1_IN */
++		DRA7XX_CORE_IOPAD(0x37A4, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* A25: spi1_sclk // GPIO7_7 // 12V_GPI2_IN */
++		DRA7XX_CORE_IOPAD(0x37AC, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* B25: spi1_d0 // GPIO7_9 // 12V_GPI3_IN */
++		DRA7XX_CORE_IOPAD(0x369C, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* B26: xref_clk2 // GPIO6_19 // 12V_GPI4_IN */
++		DRA7XX_CORE_IOPAD(0x37C0, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* A26: spi2_sclk // GPIO7_14 // 12V_GPI5_IN */
++		DRA7XX_CORE_IOPAD(0x37B4, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* A22: spi1_cs1 // GPIO7_11 // 12V_GPI6_IN */
++		DRA7XX_CORE_IOPAD(0x3570, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* D1: vin2a_d2 // GPIO4_3 // 12V_GPI7_IN */
++		DRA7XX_CORE_IOPAD(0x3580, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* C1: vin2a_d6 // GPIO4_7 // 12V_GPI8_IN */
++		DRA7XX_CORE_IOPAD(0x359C, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* C2: vin2a_d13 // GPIO4_14 // 12V_GPI9_IN */
++		DRA7XX_CORE_IOPAD(0x35A4, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* C4: vin2a_d15 // GPIO4_16 // 12V_GPI10_IN */
++		DRA7XX_CORE_IOPAD(0x35B4, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* A3: vin2a_d19 // GPIO4_27 // 12V_GPI11_IN */
++		DRA7XX_CORE_IOPAD(0x35A8, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* B2: vin2a_d16 // GPIO4_24 // 12V_GPI12_IN */
++		DRA7XX_CORE_IOPAD(0x36D0, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* D12: mcasp1_axr7 // GPIO5_9 // 12V_GPI13_IN */
++		DRA7XX_CORE_IOPAD(0x35C8, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* D11: vout1_clk // GPI04_19 // 12V_GPI14_IN */
++		DRA7XX_CORE_IOPAD(0x35D8, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* E11: vout1_vsync // GPIO4_23 // 12V_GPI15_IN */
++		DRA7XX_CORE_IOPAD(0x3638, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* A10: vout1_d23 // GPIO8_23 // 12V_GPI16_IN */
++		DRA7XX_CORE_IOPAD(0x3630, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* A9: vout1_d21 // GPIO8_21 // 12V_GPI17_IN */
++		DRA7XX_CORE_IOPAD(0x3694, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* D18: xref_clk0 // GPIO6_17 // 12V_GPI18_IN */
++
++		/* 5V GPIO - v3.2 & v3.3 */
++		DRA7XX_CORE_IOPAD(0x370C, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* C15: mcasp2_axr2 // GPIO6_8 (PR2_PRU0_GPIO16) // GPIO_5V_0 */
++		DRA7XX_CORE_IOPAD(0x36E4, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* E14: mcasp1_axr12 // GPIO4_18 (PR2_PRU1_GPIO14) // GPIO_5V_1 */
++		DRA7XX_CORE_IOPAD(0x3728, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* F15: mcasp3_fsx // GPIO5_14 (PR2_PRU0_GPIO13) // GPIO_5V_2 */
++		DRA7XX_CORE_IOPAD(0x3724, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* B18: mcasp3_aclkx // GPIO5_13 (PR2_PRU0_GPIO12) // GPIO_5V_3 */
++
++		/* PWM - v3.2 & v3.3 */
++		DRA7XX_CORE_IOPAD(0x35AC, PIN_INPUT_PULLDOWN | MUX_MODE10 ) /* D6: vin2a_d17 // EHRPWM3A // D6_EHRPWM3A */
++		DRA7XX_CORE_IOPAD(0x35B0, PIN_INPUT_PULLDOWN | MUX_MODE10 ) /* C5: vin2a_d18 // EHRPWM3B // C5_EHRPWM3B */
++		DRA7XX_CORE_IOPAD(0x358C, PIN_INPUT_PULLDOWN | MUX_MODE10 ) /* E6: vin2a_d9 // EHRPWM2A // E6_EHRPWM2A */
++		DRA7XX_CORE_IOPAD(0x3590, PIN_INPUT_PULLDOWN | MUX_MODE10 ) /* D3: vin2a_d10 // EHRPWM2B // D3_EHRPWM2B */
++
++		/* UART - v3.2 & v3.3 */
++		DRA7XX_CORE_IOPAD(0x3738, PIN_OUTPUT_PULLDOWN | MUX_MODE3 ) /* A21: mcasp4_fsx // UART8_TXD // UART8_TXD */
++		DRA7XX_CORE_IOPAD(0x3734, PIN_INPUT_PULLDOWN | MUX_MODE3 ) /* C18: mcasp4_aclkx // UART8_RXD // UART8_RXD */
++		DRA7XX_CORE_IOPAD(0x358C, PIN_OUTPUT_PULLDOWN | MUX_MODE4 ) /* C17: mcasp3_axr1 // UART5_TXD // UART5_TXD_5V */
++		DRA7XX_CORE_IOPAD(0x3590, PIN_INPUT_PULLDOWN | MUX_MODE4 ) /* B19: mcasp3_axr0 // UART5_RXD // UART5_RXD_5V *
++
++		/* Cavli C10AM-G - v3.2 & v3.3 */
++		// DRA7XX_CORE_IOPAD(0x37FC, PIN_INPUT_PULLDOWN | MUX_MODE5 ) /* C28: uart2_rtsn // UART1_RIN // UART1_RI */
++		// DRA7XX_CORE_IOPAD(0x37F0, PIN_INPUT_PULLDOWN | MUX_MODE5 ) /* D28: uart2_rxd // UART1_DCD // UART1_DCD */
++		// DRA7XX_CORE_IOPAD(0x37F8, PIN_INPUT_PULLDOWN | MUX_MODE5 ) /* D27: uart2_ctsn // UART1_DTR // UART1_DTR */
++		// DRA7XX_CORE_IOPAD(0x37EC, PIN_INPUT_PULLDOWN | MUX_MODE0 ) /* C27: uart1_rtsn // UART1_RTSN // UART1_RTS */
++		// DRA7XX_CORE_IOPAD(0x37E8, PIN_INPUT_PULLDOWN | MUX_MODE0 ) /* E25: uart1_rtsn // UART1_CTSN // UART1_CTS */
++		// DRA7XX_CORE_IOPAD(0x37E0, PIN_INPUT_PULLDOWN | MUX_MODE0 ) /* B27: uart1_rxd // UART1_RXD // UART1_RXD */
++		// DRA7XX_CORE_IOPAD(0x37E4, PIN_INPUT_PULLDOWN | MUX_MODE0 ) /* C26: uart1_txd // UART1_TXD // UART1_TXD */
++		DRA7XX_CORE_IOPAD(0x372C, PIN_INPUT_PULLDOWN | MUX_MODE4 ) /* B19: uart5_rxd // UART5_RXD // UART5_RXD */
++		DRA7XX_CORE_IOPAD(0x3730, PIN_INPUT_PULLDOWN | MUX_MODE4 ) /* C17: uart5_txd // UART5_TXD // UART5_TXD */		
++
++		DRA7XX_CORE_IOPAD(0x34E4, PIN_OUTPUT_PULLDOWN | MUX_MODE14 ) /* AD9: VIN1A_DE0 // GPIO3_0 // LTE Wakeup */
++		DRA7XX_CORE_IOPAD(0x34F8, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* AD8: VIN1A_D1 // GPIO3_5 // LTE Net Status */
++		DRA7XX_CORE_IOPAD(0x34F4, PIN_OUTPUT_PULLUP | MUX_MODE14 ) /* AE8: VIN1A_D0 // GPIO3_4 // Disable */
++		DRA7XX_CORE_IOPAD(0x34B4, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* T1: GPMC_CS0 // GPIO2_19 // LTE Status */
++		DRA7XX_CORE_IOPAD(0x34FC, PIN_OUTPUT_PULLUP | MUX_MODE14 ) /* AG7: VIN1A_D2 // GPIO3_6 // LTE Reset */
++		DRA7XX_CORE_IOPAD(0x34E8, PIN_OUTPUT_PULLUP | MUX_MODE14 ) /* AF9: VIN1A_FLD0 // GPIO3_1 // LTE Power */
++		DRA7XX_CORE_IOPAD(0x3514, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* AG4: VIN1A_D8 // GPIO3_12 // Debug RXD */
++		DRA7XX_CORE_IOPAD(0x350C, PIN_INPUT_PULLDOWN | MUX_MODE14 ) /* AG6: VIN1A_D6 // GPIO3_10 // Debug TXD */
++		>;
++	};
++};
++
++&dcan1 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&dcan1_pins_default>;
++};
++
++&dcan2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&dcan2_pins_default>;
++};
++
+ &i2c1 {
+ 	status = "okay";
+ 	clock-frequency = <400000>;
+@@ -551,9 +751,15 @@ &mmc2 {
+ 	dmas = <&sdma_xbar 47>, <&sdma_xbar 48>;
+ 	dma-names = "tx", "rx";
+ 
++	pinctrl-names = "default", "hs", "ddr_1_8v", "hs200_1_8v";
++	pinctrl-0 = <&mmc2_pins_default>;
++	pinctrl-1 = <&mmc2_pins_hs>;
++	pinctrl-2 = <&mmc2_pins_ddr_rev20>;
++	pinctrl-3 = <&mmc2_pins_hs200>;
++
+ };
+ 
+-&mmc4 {
++&mmc3 {
+ 	/* DS: Default speed (DS) up to 25 MHz, including 1- and 4-bit modes (3.3 V signaling). */
+ 	/* HS: High speed up to 50 MHz (3.3 V signaling). */
+ 	/* SDR12: SDR up to 25 MHz (1.8 V signaling). */
+@@ -565,6 +771,9 @@ &mmc4 {
+ 
+ 	ti,needs-special-reset;
+ 	vmmc-supply = <&vdd_3v3>;
++	pinctrl-names = "default", "hs";
++	pinctrl-0 = <&mmc3_pins_default &wifibt_extra_pins_default>;
++	pinctrl-1 = <&mmc3_pins_hs &wifibt_extra_pins_default>;
+ 	cap-power-off-card;
+ 	keep-power-in-suspend;
+ 	bus-width = <4>;
+@@ -602,7 +811,7 @@ &usb2_phy2 {
+ 
+ &usb1 {
+ 	status = "okay";
+-	dr_mode = "otg";
++	dr_mode = "host";
+ };
+ 
+ &omap_dwc3_1 {
+@@ -622,6 +831,8 @@ &dss {
+ &hdmi {
+ 	status = "okay";
+ 	vdda-supply = <&vdd_1v8_phy_ldo4>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&hdmi_pins_default>;
+ 
+ 	port {
+ 		hdmi_out: endpoint {
+@@ -671,6 +882,17 @@ &uart6 {
+ 	status = "okay";
+ };
+ 
++/*LTE*/
++&uart5{
++	status = "okay";
++};
++
++/*CAVLI V 3.2*/
++&uart8{
++	status = "okay";
++};
++
++
+ /* cape header stuff */
+ &i2c4 {
+ 	status = "okay";

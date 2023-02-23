@@ -1,0 +1,109 @@
+diff --git a/arch/arm/boot/dts/am5729-beagleboneai.dts b/arch/arm/boot/dts/am5729-beagleboneai.dts
+index 149cfafb90bf..03bcac78715e 100644
+--- a/arch/arm/boot/dts/am5729-beagleboneai.dts
++++ b/arch/arm/boot/dts/am5729-beagleboneai.dts
+@@ -5,7 +5,7 @@
+ 
+ /dts-v1/;
+ 
+-#include "dra74x.dtsi"
++#include "am5728.dtsi"
+ #include "am57xx-commercial-grade.dtsi"
+ #include "dra74x-mmc-iodelay.dtsi"
+ #include "dra74-ipu-dsp-common.dtsi"
+@@ -186,10 +186,14 @@ hdmi_encoder_out: endpoint@0 {
+ 	emmc_pwrseq: emmc_pwrseq {
+ 		compatible = "mmc-pwrseq-emmc";
+ 		reset-gpios = <&gpio5 7 GPIO_ACTIVE_LOW>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&emmc_pwrseq_pins_default>;
+ 	};
+ 
+ 	brcmf_pwrseq: brcmf_pwrseq {
+ 		compatible = "mmc-pwrseq-simple";
++		pinctrl-names = "default";
++		pinctrl-0 = <&brcmf_pwrseq_pins_default>;
+ 		reset-gpios = <&gpio3 22 GPIO_ACTIVE_LOW>,	/* BT-REG-ON */
+ 				<&gpio3 18 GPIO_ACTIVE_LOW>;	/* WL-REG-ON */
+ 	};
+@@ -198,6 +202,44 @@ extcon_usb1: extcon_usb1 {
+ 		compatible = "linux,extcon-usb-gpio";
+ 		ti,enable-id-detection;
+ 		id-gpio = <&gpio3 13 GPIO_ACTIVE_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&extcon_usb1_pins_default>;
++	};
++};
++
++&dra7_pmx_core {
++	extcon_usb1_pins_default: extcon_usb1_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x3518, PIN_INPUT | MUX_MODE14) /* AG2: vin1a_d9.gpio3_13  - USR0 */
++		>;
++	};
++};
++
++&dra7_pmx_core {
++ 
++	emmc_pwrseq_pins_default: emmc_pwrseq_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x36c8, PIN_OUTPUT_PULLUP | MUX_MODE14) /* F13: mcasp1_axr5.gpio5_7 - eMMC_RSTn */
++		>;
++	};
++
++	brcmf_pwrseq_pins_default: brcmf_pwrseq_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x352c, PIN_OUTPUT_PULLUP | MUX_MODE14) /* AF3: vin1a_d14.gpio3_18 - WL_REG_ON */
++			DRA7XX_CORE_IOPAD(0x353c, PIN_OUTPUT_PULLUP | MUX_MODE14) /* AE5: vin1a_d18.gpio3_22 - BT_REG_ON */
++		>;
++	};
++	hdmi_pins_default: hdmi_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x3808, PIN_INPUT | MUX_MODE1) /* C25: i2c2_sda.hdmi1_ddc_scl - HDMI_DDC_SCL */
++			DRA7XX_CORE_IOPAD(0x380C, PIN_INPUT | MUX_MODE1) /* F17: i2c2_scl.hdmi1_ddc_sda - HDMI_DDC_SDA */
++			DRA7XX_CORE_IOPAD(0x37BC, PIN_INPUT | MUX_MODE6) /* B20: spi1_cs3.hdmi1_cec - HDMI_DDC_CEC */
++#if 0
++			DRA7XX_CORE_IOPAD(0x37B8, PIN_INPUT | MUX_MODE6) /* B21: spi1_cs2.hdmi1_hpd - HDMI_DDC_HPD */
++#else
++			DRA7XX_CORE_IOPAD(0x37B8, PIN_INPUT | MUX_MODE14) /* B21: spi1_cs2.gpio7_12 - HDMI_DDC_HPD */
++#endif
++		>;
++	};
++
++	wifibt_extra_pins_default: wifibt_extra_pins_default {
++		pinctrl-single,pins = <
++			DRA7XX_CORE_IOPAD(0x3540, PIN_INPUT | MUX_MODE14) /* AE1: vin1a_d19.gpio3_23 - WL_HOST_WAKE */
++			DRA7XX_CORE_IOPAD(0x3450, PIN_INPUT | MUX_MODE8) /* P6: vin1a_d20.uart6_rxd - UART6_RXD */
++			DRA7XX_CORE_IOPAD(0x3454, PIN_INPUT | MUX_MODE8) /* R9: vin1a_d21.uart6_txd - UART6_TXD */
++			DRA7XX_CORE_IOPAD(0x3458, PIN_INPUT | MUX_MODE8) /* R5: vin1a_d22.uart6_ctsn - UART6_CTSN */
++			DRA7XX_CORE_IOPAD(0x345c, PIN_INPUT | MUX_MODE8) /* P5: vin1a_d23.uart6_rtsn - UART6_RTSN */
++			DRA7XX_CORE_IOPAD(0x3534, PIN_INPUT_PULLDOWN | MUX_MODE14) /* AF1: vin1a_d16.gpio3_20 - BT_HOST_WAKE */
++			DRA7XX_CORE_IOPAD(0x3538, PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* AE3: vin1a_d6.gpio3_21 - BT_WAKE */
++		>;
+ 	};
+ };
+ 
+@@ -565,6 +607,9 @@ &mmc4 {
+ 
+ 	ti,needs-special-reset;
+ 	vmmc-supply = <&vdd_3v3>;
++	pinctrl-names = "default", "hs";
++	pinctrl-0 = <&mmc4_pins_default &wifibt_extra_pins_default>;
++	pinctrl-1 = <&mmc4_pins_hs &wifibt_extra_pins_default>;
+ 	cap-power-off-card;
+ 	keep-power-in-suspend;
+ 	bus-width = <4>;
+
+	 &omap_dwc3_1 {
+@@ -622,6 +831,8 @@ &dss {
+ &hdmi {
+ 	status = "okay";
+ 	vdda-supply = <&vdd_1v8_phy_ldo4>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&hdmi_pins_default>;
+ 
+ 	port {
+ 		hdmi_out: endpoint {
+@@ -671,6 +882,17 @@ &uart6 {
+ 	status = "okay";
+ };
