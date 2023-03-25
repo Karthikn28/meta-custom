@@ -1,11 +1,48 @@
-IMAGE_INSTALL:append = " nano htop libgpiod usbutils brcm43430 can-utils gtk+3 gtk+3-dev gtk+3-demo linux-firmware\
-                        libgpiod-tools libgpiod-dev kernel-modules net-tools i2c-tools openssh openssh-sftp-server\
-                        zeromq module-init-tools devmem2 libdrm-omap mmc-utils systemd-analyze ntpdate\
-                        packagegroup-core-buildessential packagegroup-agl-networking libsdl2"
+VCU_BASE = "\
+    nano \
+    htop \
+    usbutils \
+    curl \
+    brcm43430 \
+    can-utils \
+    bash \
+    libgpiod \
+    libgpiod-tools \ 
+    linux-firmware \
+    openssh \
+    zeromq \
+    libsdl2 \
+    pru-icss \
+    bluez5 \
+"
 
-# Select xserver-xorg as default, since kdrive has been EOL'ed
-# XSERVER ?= "xserver-xorg xf86-input-evdev xf86-input-keyboard xf86-input-mouse xf86-video-fbdev"
+# These require meta-openembedded/meta-oe layer
 
-# USE-flag like features
-DISTRO_FEATURES += "x11 wayland opengl"
+VCU_EXTRA = "\
+    devmem2 \
+    tcpdump \
+    parted \
+    openssh-sftp-server \
+    kernel-modules \
+    git \
+    perl-module-utf8 \
+    perl-module-base \
+    perl-module-file-glob \
+    libgpiod-dev \
+    minicom \
+    openssl \
+    wget \
+    procps \
+    cpufrequtils \
+"
+VCU_DEV = "\
+    packagegroup-core-buildessential \
+    packagegroup-core-tools-profile \
+    packagegroup-core-tools-debug \
+    "
 
+IMAGE_INSTALL:append = " \
+    ${VCU_BASE} \
+    ${VCU_EXTRA} \
+    ${VCU_DEV} \
+    "
