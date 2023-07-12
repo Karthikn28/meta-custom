@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI += "file://vcu.cfg\
-            file://0004-vcu-dts.patch"
+SRC_URI += "file://kernel.cfg\
+            file://0005-vcu-dts-pru-irq.patch"
             
-KERNEL_CONFIG_FRAGMENTS += "${WORKDIR}/vcu.cfg"
+KERNEL_CONFIG_FRAGMENTS += "${WORKDIR}/kernel.cfg"

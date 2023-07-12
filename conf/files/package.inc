@@ -5,7 +5,6 @@ VCU_BASE = "\
     curl \
     brcm43430 \
     can-utils \
-    bash \
     libgpiod \
     libgpiod-tools \ 
     linux-firmware \
@@ -14,6 +13,10 @@ VCU_BASE = "\
     libsdl2 \
     pru-icss \
     bluez5 \
+    python3-pyzmq \
+    cronie \
+    rsyslog \
+    iw \
 "
 
 # These require meta-openembedded/meta-oe layer
@@ -27,19 +30,21 @@ VCU_EXTRA = "\
     git \
     perl-module-utf8 \
     perl-module-base \
-    perl-module-file-glob \
     libgpiod-dev \
     minicom \
     openssl \
     wget \
     procps \
     cpufrequtils \
+    util-linux \
 "
 VCU_DEV = "\
     packagegroup-core-buildessential \
     packagegroup-core-tools-profile \
     packagegroup-core-tools-debug \
     "
+PACKAGE_CLASSES ?= "package_deb"
+PREFERRED_VERSION_linux-ti-staging = "5.10%"
 
 IMAGE_INSTALL:append = " \
     ${VCU_BASE} \
