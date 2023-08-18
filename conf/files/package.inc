@@ -17,6 +17,14 @@ VCU_BASE = "\
     cronie \
     rsyslog \
     iw \
+    dnsmasq \
+    cifs-utils \
+    nfs-utils \
+    mmc-utils \
+    dosfstools \
+    e2fsprogs \
+    flutter-engine-sdk-dev \
+    dpkg \
 "
 
 # These require meta-openembedded/meta-oe layer
@@ -37,17 +45,21 @@ VCU_EXTRA = "\
     procps \
     cpufrequtils \
     util-linux \
+    flutter-pi \
+    rsync \
 "
 VCU_DEV = "\
     packagegroup-core-buildessential \
     packagegroup-core-tools-profile \
     packagegroup-core-tools-debug \
     "
-PACKAGE_CLASSES ?= "package_deb"
-PREFERRED_VERSION_linux-ti-staging = "5.10%"
+
 
 IMAGE_INSTALL:append = " \
     ${VCU_BASE} \
     ${VCU_EXTRA} \
     ${VCU_DEV} \
     "
+PACKAGE_CLASSES ?= "package_deb"
+PREFERRED_VERSION_linux-ti-staging = "5.10%"
+# AGL_FLUTTER_DEFAULT_RUNTIME = "debug"
